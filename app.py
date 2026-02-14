@@ -1,12 +1,5 @@
-"""
-Real-Time Log Stream with Live Model Visualizations
-===================================================
-One log at a time with animated model decision visualizations
-"""
-
 from flask import Flask, render_template, jsonify
 from flask_cors import CORS
-import pandas as pd
 import pickle
 import numpy as np
 from datetime import datetime
@@ -14,6 +7,8 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.svm import SVC
+import csv
+import os
 
 app = Flask(__name__)
 CORS(app)
@@ -28,32 +23,59 @@ with open('feature_names.pkl', 'rb') as f:
 
 # Load the dataset
 print("📊 Loading server logs...")
-df = pd.read_csv('server.csv')
+data_records = []
+try:
+    csv_path = 'server_sample.csv'
+    if not os.path.exists(csv_path):
+        print(f"Warning: {csv_path} not found")
+        # Fallback to server.csv if sample doesn't exist, but warn
+        if os.path.exists('server.csv'):
+            csv_path = 'server.csv'
+    
+    if os.path.exists(csv_path):
+        with open(csv_path, 'r') as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                data_records.append(row)
+        print(f"✅ Loaded {len(data_records)} server logs from {csv_path}")
+    else:
+        print("❌ No CSV file found!")
+except Exception as e:
+    print(f"Error loading CSV: {e}")
 
-# Preprocess
-df_processed = df.copy()
-cols_to_drop = ['timestamp', 'source_ip', 'session_id']
-df_processed = df_processed.drop(columns=[col for col in cols_to_drop if col in df_processed.columns])
+# Prepare data for training
+print("\n🤖 Training models...")
+X_data = []
+y_data = []
 
-X = df_processed.drop('is_malicious', axis=1)
-y = df_processed['is_malicious']
+if feature_names:
+    for row in data_records:
+        try:
+            features_row = []
+            for feat in feature_names:
+                val = row.get(feat, 0)
+                try:
+                    val = float(val) if val != '' else 0.0
+                except ValueError:
+                    val = 0.0
+                features_row.append(val)
+            
+            label = int(row.get('is_malicious', 0))
+            X_data.append(features_row)
+            y_data.append(label)
+        except Exception:
+            continue
 
-# Handle missing values
-for col in X.columns:
-    if X[col].isnull().sum() > 0:
-        if X[col].dtype in ['float64', 'int64']:
-            X[col].fillna(X[col].median(), inplace=True)
-        else:
-            X[col].fillna(X[col].mode()[0], inplace=True)
+X = np.array(X_data)
+y = np.array(y_data)
 
 # Scale
-X_scaled = scaler.transform(X)
-
-print(f"✅ Loaded {len(X)} server logs")
+if len(X) > 0 and scaler:
+    X_scaled = scaler.transform(X)
+else:
+    X_scaled = np.array([])
 
 # Initialize models
-print("\n🤖 Training models...")
-
 models = {
     'Decision Tree': DecisionTreeClassifier(max_depth=10, min_samples_split=20, min_samples_leaf=10, random_state=42),
     'KNN': KNeighborsClassifier(n_neighbors=5, weights='uniform', metric='euclidean'),
@@ -61,15 +83,17 @@ models = {
     'SVM': SVC(kernel='rbf', probability=True, random_state=42)
 }
 
-for name, model in models.items():
-    print(f"   Training {name}...")
-    model.fit(X_scaled, y)
-
-print("\n✅ All models ready!")
+if len(X_scaled) > 0:
+    for name, model in models.items():
+        print(f"   Training {name}...")
+        model.fit(X_scaled, y)
+    print("\n✅ All models ready!")
+else:
+    print("Warning: No data to train models!")
 
 # Global state
 current_log_index = 0
-total_logs = len(X)
+total_logs = len(data_records)
 model_stats = {name: {'correct': 0, 'total': 0} for name in models.keys()}
 
 
@@ -83,43 +107,60 @@ def next_log():
     """Get next single log with all model predictions"""
     global current_log_index
     
-    log_data = X.iloc[current_log_index]
-    actual_label = int(y.iloc[current_log_index])
-    original_log = df.iloc[current_log_index]
+    if total_logs == 0:
+        return jsonify({'error': 'No data'})
+
+    raw_record = data_records[current_log_index]
+    
+    # Prepare features
+    features_values = []
+    if feature_names:
+        for feat in feature_names:
+            val = raw_record.get(feat, 0)
+            try:
+                val = float(val) if val != '' else 0.0
+            except ValueError:
+                val = 0.0
+            features_values.append(val)
+        
+    actual_label = int(raw_record.get('is_malicious', 0))
     
     # Get raw log string (simulate real server log)
     timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
     
     # Make predictions with all models
-    log_scaled = scaler.transform(log_data[feature_names].values.reshape(1, -1))
     predictions = {}
     
-    for name, model in models.items():
-        pred = model.predict(log_scaled)[0]
-        proba = model.predict_proba(log_scaled)[0]
+    if scaler:
+        log_scaled = scaler.transform(np.array(features_values).reshape(1, -1))
         
-        predictions[name] = {
-            'prediction': int(pred),
-            'prediction_label': 'MALICIOUS' if pred == 1 else 'NORMAL',
-            'confidence': float(max(proba)),
-            'confidence_malicious': float(proba[1]),
-            'confidence_normal': float(proba[0]),
-            'is_correct': bool(pred == actual_label)
-        }
-        
-        # Update stats
-        model_stats[name]['total'] += 1
-        if pred == actual_label:
-            model_stats[name]['correct'] += 1
+        for name, model in models.items():
+            if hasattr(model, 'predict'):
+                pred = model.predict(log_scaled)[0]
+                proba = model.predict_proba(log_scaled)[0]
+                
+                predictions[name] = {
+                    'prediction': int(pred),
+                    'prediction_label': 'MALICIOUS' if pred == 1 else 'NORMAL',
+                    'confidence': float(max(proba)),
+                    'confidence_malicious': float(proba[1]),
+                    'confidence_normal': float(proba[0]),
+                    'is_correct': bool(pred == actual_label)
+                }
+                
+                # Update stats
+                model_stats[name]['total'] += 1
+                if pred == actual_label:
+                    model_stats[name]['correct'] += 1
     
     # Extract key features for visualization
     features = {
-        'request_count': float(log_data['request_count']),
-        'request_rate': float(log_data['request_rate']),
-        'auth_failure_rate': float(log_data['auth_failure_rate']),
-        'burst_rate': float(log_data['burst_rate']),
-        'status_4xx_count': float(log_data['status_4xx_count']),
-        'suspicious_method_ratio': float(log_data['suspicious_method_ratio'])
+        'request_count': float(raw_record.get('request_count', 0)),
+        'request_rate': float(raw_record.get('request_rate', 0)),
+        'auth_failure_rate': float(raw_record.get('auth_failure_rate', 0)),
+        'burst_rate': float(raw_record.get('burst_rate', 0)),
+        'status_4xx_count': float(raw_record.get('status_4xx_count', 0)),
+        'suspicious_method_ratio': float(raw_record.get('suspicious_method_ratio', 0))
     }
     
     # Create raw log message
@@ -162,7 +203,7 @@ def reset():
 
 if __name__ == '__main__':
     print("\n" + "="*70)
-    print("⚡ THREATGUARD AI - Enterprise Threat Detection System")
+    print("⚡ CYWATCH AI - Enterprise Threat Detection System")
     print("="*70)
     print(f"📊 Dataset: {total_logs:,} server logs")
     print(f"🤖 Active Models: {len(models)}")
