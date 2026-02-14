@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real-Time Log Analyzer</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
+        rel="stylesheet">
+</head>
+
+<body class="dark-mode">
+    <!-- Header -->
+    <header class="header">
+        <div class="header-left">
+            <h1>🛡️ Real-Time Threat Detection System</h1>
+            <p class="subtitle">Live Server Log Analysis with 4 ML Models</p>
+        </div>
+        <div class="header-controls">
+            <button class="theme-toggle" id="themeToggle">
+                <span id="themeIcon">🌙</span>
+            </button>
+            <button class="btn btn-start" id="playPauseBtn">▶️ Start</button>
+            <button class="btn btn-reset" id="resetBtn">🔄 Reset</button>
+        </div>
+    </header>
+
+    <!-- Main Content: 50/50 Split -->
+    <main class="main-container">
+        <!-- LEFT: Terminal-Style Log Stream -->
+        <div class="terminal-panel">
+            <div class="terminal-header">
+                <div class="terminal-title">
+                    <span class="terminal-icon">📡</span>
+                    <span>Live Server Logs</span>
+                </div>
+                <div class="terminal-status">
+                    <span class="status-dot"></span>
+                    <span id="streamStatus">STREAMING</span>
+                </div>
+            </div>
+
+            <div class="terminal-body" id="terminalBody">
+                <div class="terminal-welcome">
+                    <pre>
+╔══════════════════════════════════════════════════════════════════╗
+║   SECURE LOG MONITORING SYSTEM v2.0                              ║
+║   Waiting for incoming server logs...                            ║
+║   Press START to begin real-time analysis                        ║
+╚══════════════════════════════════════════════════════════════════╝
+                    </pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT: Model Visualizations -->
+        <div class="models-panel">
+            <!-- Decision Tree -->
+            <div class="model-viz-card">
+                <div class="model-header">
+                    <div class="model-title">
+                        <span class="model-icon">🌳</span>
+                        <div>
+                            <h3>Decision Tree</h3>
+                            <p>Tree-based classification</p>
+                        </div>
+                    </div>
+                    <div class="model-accuracy">
+                        <span class="acc-label">Accuracy:</span>
+                        <span class="acc-value" id="dt-acc">0%</span>
+                    </div>
+                </div>
+                <div class="viz-container">
+                    <canvas id="dtCanvas" width="400" height="180"></canvas>
+                </div>
+                <div class="prediction-result" id="dt-result">
+                    <span class="pred-label">Waiting...</span>
+                </div>
+            </div>
+
+            <!-- KNN -->
+            <div class="model-viz-card">
+                <div class="model-header">
+                    <div class="model-title">
+                        <span class="model-icon">🎯</span>
+                        <div>
+                            <h3>K-Nearest Neighbors</h3>
+                            <p>Similarity-based classification</p>
+                        </div>
+                    </div>
+                    <div class="model-accuracy">
+                        <span class="acc-label">Accuracy:</span>
+                        <span class="acc-value" id="knn-acc">0%</span>
+                    </div>
+                </div>
+                <div class="viz-container">
+                    <canvas id="knnCanvas" width="400" height="180"></canvas>
+                </div>
+                <div class="prediction-result" id="knn-result">
+                    <span class="pred-label">Waiting...</span>
+                </div>
+            </div>
+
+            <!-- Random Forest -->
+            <div class="model-viz-card">
+                <div class="model-header">
+                    <div class="model-title">
+                        <span class="model-icon">🌲</span>
+                        <div>
+                            <h3>Random Forest</h3>
+                            <p>Ensemble decision making</p>
+                        </div>
+                    </div>
+                    <div class="model-accuracy">
+                        <span class="acc-label">Accuracy:</span>
+                        <span class="acc-value" id="rf-acc">0%</span>
+                    </div>
+                </div>
+                <div class="viz-container">
+                    <canvas id="rfCanvas" width="400" height="180"></canvas>
+                </div>
+                <div class="prediction-result" id="rf-result">
+                    <span class="pred-label">Waiting...</span>
+                </div>
+            </div>
+
+            <!-- SVM -->
+            <div class="model-viz-card">
+                <div class="model-header">
+                    <div class="model-title">
+                        <span class="model-icon">⚡</span>
+                        <div>
+                            <h3>Support Vector Machine</h3>
+                            <p>Hyperplane separation</p>
+                        </div>
+                    </div>
+                    <div class="model-accuracy">
+                        <span class="acc-label">Accuracy:</span>
+                        <span class="acc-value" id="svm-acc">0%</span>
+                    </div>
+                </div>
+                <div class="viz-container">
+                    <canvas id="svmCanvas" width="400" height="180"></canvas>
+                </div>
+                <div class="prediction-result" id="svm-result">
+                    <span class="pred-label">Waiting...</span>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+
+</html>
