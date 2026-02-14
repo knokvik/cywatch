@@ -162,13 +162,13 @@ def reset():
 
 if __name__ == '__main__':
     print("\n" + "="*70)
-    print("🚀 Real-Time Log Stream with Live Model Visualizations")
+    print("⚡ THREATGUARD AI - Enterprise Threat Detection System")
     print("="*70)
-    print(f"📊 Dataset: {total_logs:,} logs")
-    print(f"🤖 Models: {len(models)}")
+    print(f"📊 Dataset: {total_logs:,} server logs")
+    print(f"🤖 Active Models: {len(models)}")
     for name in models.keys():
-        print(f"   - {name}")
-    print(f"🌐 Open: http://localhost:5001")
+        print(f"   ✓ {name}")
+    print(f"🌐 Dashboard: http://localhost:5001")
     print("="*70 + "\n")
     
     app.run(debug=True, host='0.0.0.0', port=5001)
