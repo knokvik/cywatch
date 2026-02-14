@@ -1,11 +1,11 @@
-// ThreatGuard AI - Real-Time Threat Detection Dashboard
+// CyWatch AI - Real-Time Threat Detection Dashboard
 
-class ThreatGuardDashboard {
+class CyWatchDashboard {
     constructor() {
         this.isPlaying = false;
         this.intervalId = null;
         this.speed = 1500;
-        this.isDarkMode = true;
+        this.isDarkMode = false;
         this.maxLogs = 100;
 
         // Store all processed logs data for visualizations
@@ -102,7 +102,7 @@ class ThreatGuardDashboard {
                 <div class="terminal-welcome">
                     <pre>
 ╔══════════════════════════════════════════════════════════════════╗
-║            THREATGUARD AI - SECURITY MONITORING v3.0             ║
+║              CYWATCH AI - SECURITY MONITORING v3.0               ║
 ║   Advanced Multi-Model Threat Detection & Analysis System        ║
 ║   Press START to begin real-time log monitoring                  ║
 ╚══════════════════════════════════════════════════════════════════╝
@@ -539,7 +539,7 @@ class ThreatGuardDashboard {
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('⚡ ThreatGuard AI Initialized');
-    const dashboard = new ThreatGuardDashboard();
+    console.log('⚡ CyWatch AI Initialized');
+    const dashboard = new CyWatchDashboard();
     window.dashboard = dashboard;
 });
