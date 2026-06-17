@@ -1,10 +1,10 @@
-# ⚡ ThreatGuard AI
+# ⚡ CyWatch AI
 
 **Enterprise-Grade Multi-Model Threat Detection System**
 
 Real-time server log analysis with 4 simultaneous machine learning models, providing comprehensive threat detection through diverse algorithmic approaches.
 
-![ThreatGuard AI](https://img.shields.io/badge/ThreatGuard-AI-6366f1?style=for-the-badge)
+![CyWatch AI](https://img.shields.io/badge/CyWatch-AI-6366f1?style=for-the-badge)
 ![Python](https://img.shields.io/badge/Python-3.9+-blue?style=for-the-badge)
 ![ML Models](https://img.shields.io/badge/ML%20Models-4-green?style=for-the-badge)
 ![Status](https://img.shields.io/badge/Status-Production%20Ready-success?style=for-the-badge)
@@ -13,7 +13,7 @@ Real-time server log analysis with 4 simultaneous machine learning models, provi
 
 ## 🎯 Overview
 
-ThreatGuard AI is a sophisticated real-time threat detection dashboard that simultaneously analyzes server logs using **4 different machine learning algorithms**. It provides live visualizations showing not just predictions, but **how each model thinks** and makes decisions.
+CyWatch AI is a sophisticated real-time threat detection dashboard that simultaneously analyzes server logs using **4 different machine learning algorithms**. It provides live visualizations showing not just predictions, but **how each model thinks** and makes decisions.
 
 ### Key Features
 
@@ -44,7 +44,7 @@ ThreatGuard AI is a sophisticated real-time threat detection dashboard that simu
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                    ⚡ ThreatGuard AI                         │
+│                    ⚡ CyWatch AI                         │
 ├──────────────────────────┬──────────────────────────────────┤
 │   LEFT: Terminal Logs    │   RIGHT: Model Visualizations    │
 │                          │                                  │
@@ -337,7 +337,7 @@ For questions, issues, or feature requests, please open an issue on GitHub.
 
 ---
 
-**⚡ ThreatGuard AI** - *Where Multiple Minds Protect Better Than One*
+**⚡ CyWatch AI** - *Where Multiple Minds Protect Better Than One*
 
 ---
 
